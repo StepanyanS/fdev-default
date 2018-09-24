@@ -2,7 +2,8 @@ import * as express from 'express';
 import * as webpack from 'webpack';
 import webpackConfig, { IWebpackConfig } from '../../config/webpack.config';
 import { RequestHandlerParams } from 'express-serve-static-core';
-import { Options } from 'webpack-hot-middleware';
+import { Options as WebpackHotMiddlewareOptions } from 'webpack-hot-middleware';
+import { Options as WebpackDevMiddlewareOptions } from 'webpack-dev-middleware';
 import opn = require('opn');
 import cursor from '../lib/cursor';
 import { HtmlWebpack } from './html-webpack';
@@ -50,11 +51,11 @@ export class App {
 
         // import webpack-dev-middleware
         const webpackDevMiddleware = await import('webpack-dev-middleware');
-        this.webpackDevMiddleware = webpackDevMiddleware(this.compiler as webpack.Compiler, this.webpackConfig.devServer);
+        this.webpackDevMiddleware = webpackDevMiddleware(this.compiler as webpack.Compiler, this.webpackConfig.devServer as WebpackDevMiddlewareOptions);
 
         // import webpack-hot-middleware
         const webpackHotMiddleware = await import('webpack-hot-middleware');
-        this.webpackHotMiddleware = webpackHotMiddleware(this.compiler as webpack.Compiler, this.webpackConfig.devServer as Options);
+        this.webpackHotMiddleware = webpackHotMiddleware(this.compiler as webpack.Compiler, this.webpackConfig.devServer as WebpackHotMiddlewareOptions);
 
         // define static static-middleware
         const staticMiddleware = express.static('dist');

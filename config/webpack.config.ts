@@ -5,18 +5,10 @@ import * as MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import * as UglifyJsPlugin from 'uglifyjs-webpack-plugin';
 import * as CompressionPlugin from 'compression-webpack-plugin';
 import { resolve } from 'path';
-
-export interface IDevServer {
-    port: number,
-    contentBase: string,
-    publicPath: string,
-    host: string,
-    overlay: boolean,
-    stats: any
-}
+import { Configuration as DevServerConfiguration } from 'webpack-dev-server';
 
 export interface IWebpackConfig extends webpack.Configuration {
-    devServer: IDevServer
+    devServer: DevServerConfiguration
 }
 
 // webpack config
