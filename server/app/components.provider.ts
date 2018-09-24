@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import { watch } from 'chokidar';
 
 export class ComponentsProvider {
@@ -18,8 +18,11 @@ export class ComponentsProvider {
     // define generated components file path
     generatedComponentsFile = resolve(__dirname, '../../client/components.js');
 
-    private importComponetns(): void {
-        this.components = require('../../src/components/components');
+    private getModuleData(moduleFile: string): string[] {
+        let data = readFileSync(moduleFile, { encoding: 'utf-8' }).replace(/(\r\n|\n|\r|\s)/gm,"");
+        return data.slice(data.indexOf('[') + 1, data.indexOf(']')).split('\'').filter((item) => {
+            return item !== ',' && item !== '' && item !== '//' && item !== ',//'
+        });
     }
 
     private capitalize(str: string): string {
@@ -38,7 +41,7 @@ export class ComponentsProvider {
 
     private getRequireCode(): { requireStr: string, writeCode: string, consoleStr: string } {
 
-        this.importComponetns();
+        this.components = this.getModuleData(this.componentsFile);
 
         // define string for require in components module
         let requireStr = '';
@@ -88,15 +91,10 @@ export class ComponentsProvider {
         writeFileSync(this.generatedComponentsFile, writeCode);
 
         // console.log(consoleStr);
-
-        // delete require cache to refresh components array
-        delete require.cache[this.componentsFile];
     }
 
     public provide(): void {
         this.writeFile();
-        watch(this.componentsFile).on('change', () => {
-            this.writeFile();
-        });
+        watch(this.componentsFile, { usePolling: true }).on('change', this.writeFile.bind(this));
     }
 }
